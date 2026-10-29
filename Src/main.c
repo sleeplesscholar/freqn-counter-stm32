@@ -52,7 +52,7 @@ void pcf8574_write(uint8_t data) {
 void lcd_send_nibble(uint8_t nibble, uint8_t rs) {
     uint8_t out_data = 0;
 
-    out_data = (nibble & 0xF0); // Map 4 bits to upper nibble (P4-P7)
+    out_data = (nibble & 0xF0); // Map 4 bits to upper nibble (P4-P7), this is where the actual data and command bits are
     out_data |= (1 << 3);       // Backlight ON (P3 = 1)
 
     if (rs) {
@@ -71,6 +71,7 @@ void lcd_send_nibble(uint8_t nibble, uint8_t rs) {
     //high and low are done because the LCD latches data only on falling edge
 }
 
+
 // --- LCD Command and Data Wrappers ---
 void lcd_send_cmd(uint8_t cmd) {
     lcd_send_nibble(cmd & 0xF0, 0);          // Upper nibble
@@ -81,9 +82,10 @@ void lcd_send_data(uint8_t data) {
     lcd_send_nibble(data & 0xF0, 1);          // Upper nibble
     lcd_send_nibble((data << 4) & 0xF0, 1);   // Lower nibble
 }
+//takes data and command one nibble at a time
 
 void lcd_init(void) {
-    for (volatile int i = 0; i < 2000000; i++); // Power-up delay
+    for (volatile int i = 0; i < 2000000; i++); // taking in account the powerup delay
 
     // Send 0x33, then 0x32 to properly initialize the HD44780 into 4-bit mode via I2C backpack
     lcd_send_nibble(0x30, 0);
@@ -101,7 +103,7 @@ void lcd_init(void) {
     lcd_send_cmd(0x01); // Clear Display
     for (volatile int i = 0; i < 10000; i++); // Clear command needs extra execution time
     lcd_send_cmd(0x06); // Entry Mode Set: Increment cursor, no shift
-    //commands from HD44780
+    //commands from HD44780 datasheet
 }
 
 //runs everytime a rising edge occurs
@@ -205,8 +207,7 @@ int main(void){
 	    GPIOC->ODR |= (1 << 13); // Turn LED OFF
 
 
-	while(1){
-		if(update_flag ==1){
+	while(1){	if(update_flag ==1){
 			update_flag = 0;
 			I2C_send();
 		}

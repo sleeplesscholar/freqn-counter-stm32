@@ -163,7 +163,7 @@ int main(void){
 
 	GPIOA->CRL &= ~(0xF<<0); //resetting pin 0
 	GPIOA->CRL |= (0b1000<<0); //push-pull input for pin 0
-	GPIOA->ODR |= (0b1<<0); // explicit pull-up config for pin 0 input(active low)
+	GPIOA->ODR |= (0b1<<0); // explicit pull-up config for pin 0 input(active low), pull up or down makes no diff here
 
 	TIM2->PSC = 7199; // value+1 divides the internal clock(72 MHz) to make it countable, speed config
 	TIM2->ARR = 9999; // total number of ticks the timer makes before event interrupt is fired automatically (value+1), limit config
